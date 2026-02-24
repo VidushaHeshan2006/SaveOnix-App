@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:SaveOnix-App/Screens/signup_screen.dart';
+import 'signup_screen.dart';
 import '../styles/welcome_style.dart';
 
 
