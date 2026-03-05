@@ -45,4 +45,62 @@ class AuthService {
       return {"error": "Unable to signup: $e"};
     }
   }
+
+  // -------------------
+  // FORGOT PASSWORD (Send OTP to Email)
+  // -------------------
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/forgot-password"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email,
+        }),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {"error": "Failed to send reset email: $e"};
+    }
+  }
+
+  // -------------------
+  // VERIFY OTP
+  // -------------------
+  Future<Map<String, dynamic>> verifyOtp(String email, String otp) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/verify-otp"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email,
+          "token": otp,
+        }),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {"error": "OTP verification failed: $e"};
+    }
+  }
+
+  // -------------------
+  // RESET PASSWORD
+  // -------------------
+  Future<Map<String, dynamic>> resetPassword(String newPassword) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/reset-password"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "new_password": newPassword,
+        }),
+      );
+
+      return jsonDecode(response.body);
+    } catch (e) {
+      return {"error": "Password reset failed: $e"};
+    }
+  }
 }
