@@ -20,8 +20,7 @@ app.add_middleware(
 # SUPABASE CONFIG
 # -----------------------------
 SUPABASE_URL = "https://kywgvsnmvwvjtedsdral.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5d2d2c25tdnd2anRlZHNkcmFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2NTQyODUsImV4cCI6MjA4NDIzMDI4NX0.UcnRh6Aw_mUCr4gcWb0TrtDl7A_vfyCfxwK5yeQ9mZA"
-
+SUPABASE_KEY = "YOUR_SUPABASE_KEY"
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -39,7 +38,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class ForgotPasswordRequest(BaseModel):
+class SendOtpRequest(BaseModel):
     email: str
 
 
@@ -49,15 +48,17 @@ class VerifyOtpRequest(BaseModel):
 
 
 class ResetPasswordRequest(BaseModel):
+    email: str
     new_password: str
 
 
 # -----------------------------
-# TEST ROUTE
+# ROOT
 # -----------------------------
 @app.get("/")
 def home():
-    return {"message": "Backend is running"}
+    return {"message": "Backend running"}
+
 
 # -----------------------------
 # SIGNUP
@@ -65,27 +66,32 @@ def home():
 @app.post("/signup")
 def signup(data: SignupRequest):
 
-    response = supabase.auth.sign_up({
-        "email": data.email,
-        "password": data.password
-    })
+    try:
 
-    if response.user is None:
-        return {"error": "Signup failed"}
+        response = supabase.auth.sign_up({
+            "email": data.email,
+            "password": data.password
+        })
 
-    supabase.table("users").insert({
-        "id": response.user.id,
-        "email": response.user.email,
-        "full_name": data.full_name
-    }).execute()
+        if response.user is None:
+            return {"error": "Signup failed"}
 
-    return {
-        "message": "Signup successful",
-        "user": {
+        supabase.table("users").insert({
             "id": response.user.id,
-            "email": response.user.email
+            "email": response.user.email,
+            "full_name": data.full_name
+        }).execute()
+
+        return {
+            "message": "Signup successful",
+            "user": {
+                "id": response.user.id,
+                "email": response.user.email
+            }
         }
-    }
+
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # -----------------------------
@@ -94,33 +100,45 @@ def signup(data: SignupRequest):
 @app.post("/login")
 def login(data: LoginRequest):
 
-    response = supabase.auth.sign_in_with_password({
-        "email": data.email,
-        "password": data.password
-    })
+    try:
 
-    if response.user is None:
-        return {"error": "Invalid email or password"}
+        response = supabase.auth.sign_in_with_password({
+            "email": data.email,
+            "password": data.password
+        })
 
-    return {
-        "message": "Login successful",
-        "user": {
-            "id": response.user.id,
-            "email": response.user.email
-        },
-        "access_token": response.session.access_token
-    }
+        if response.user is None:
+            return {"error": "Invalid email or password"}
+
+        return {
+            "message": "Login successful",
+            "user": {
+                "id": response.user.id,
+                "email": response.user.email
+            },
+            "access_token": response.session.access_token
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # -----------------------------
-# FORGOT PASSWORD
+# SEND OTP
 # -----------------------------
-@app.post("/forgot-password")
-def forgot_password(data: ForgotPasswordRequest):
+@app.post("/send-otp")
+def send_otp(data: SendOtpRequest):
 
-    supabase.auth.reset_password_for_email(data.email)
+    try:
 
-    return {"message": "OTP sent to email"}
+        supabase.auth.sign_in_with_otp({
+            "email": data.email
+        })
+
+        return {"message": "OTP sent to email"}
+
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # -----------------------------
@@ -129,13 +147,27 @@ def forgot_password(data: ForgotPasswordRequest):
 @app.post("/verify-otp")
 def verify_otp(data: VerifyOtpRequest):
 
-    response = supabase.auth.verify_otp({
-        "email": data.email,
-        "token": data.token,
-        "type": "recovery"
-    })
+    try:
 
-    return {"message": "OTP verified"}
+        response = supabase.auth.verify_otp({
+            "email": data.email,
+            "token": data.token,
+            "type": "email"
+        })
+
+        if response.user is None:
+            return {"error": "Invalid OTP"}
+
+        return {
+            "message": "OTP verified",
+            "user": {
+                "id": response.user.id,
+                "email": response.user.email
+            }
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
 
 
 # -----------------------------
@@ -144,8 +176,14 @@ def verify_otp(data: VerifyOtpRequest):
 @app.post("/reset-password")
 def reset_password(data: ResetPasswordRequest):
 
-    supabase.auth.update_user({
-        "password": data.new_password
-    })
+    try:
 
-    return {"message": "Password updated successfully"}
+        supabase.auth.admin.update_user_by_id(
+            data.email,
+            {"password": data.new_password}
+        )
+
+        return {"message": "Password updated successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}
