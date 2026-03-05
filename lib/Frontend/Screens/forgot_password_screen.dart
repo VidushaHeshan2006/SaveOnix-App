@@ -10,48 +10,34 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-
   final emailController = TextEditingController();
 
   void sendOtp() async {
+    final email = emailController.text.trim();
+    final result = await AuthService().sendOtp(email);
 
-    final result = await AuthService()
-        .forgotPassword(emailController.text.trim());
-
-    if(result["message"] != null){
-
+    if (result["error"] != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result["error"])));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("OTP sent to email")));
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => OtpScreen(email: emailController.text.trim()),
-        ),
+        MaterialPageRoute(builder: (_) => OtpScreen(email: email)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(title: const Text("Forgot Password")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                  labelText: "Enter Email"
-              ),
-            ),
-
+            TextField(controller: emailController, decoration: const InputDecoration(labelText: "Enter Email")),
             const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: sendOtp,
-              child: const Text("Send OTP"),
-            )
+            ElevatedButton(onPressed: sendOtp, child: const Text("Send OTP")),
           ],
         ),
       ),
