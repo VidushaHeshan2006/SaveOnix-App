@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  final String baseUrl = "http://127.0.0.1:8000"; // Your backend URL
+
+  final String baseUrl = "http://10.0.2.2:8000";
 
   // SIGNUP
   Future<Map<String, dynamic>> signup(String email, String password, String? fullName) async {
@@ -10,7 +11,11 @@ class AuthService {
       final response = await http.post(
         Uri.parse("$baseUrl/signup"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password, "full_name": fullName}),
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+          "full_name": fullName
+        }),
       );
       return jsonDecode(response.body);
     } catch (e) {
@@ -24,7 +29,10 @@ class AuthService {
       final response = await http.post(
         Uri.parse("$baseUrl/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
+        body: jsonEncode({
+          "email": email,
+          "password": password
+        }),
       );
       return jsonDecode(response.body);
     } catch (e) {
@@ -38,7 +46,7 @@ class AuthService {
       final response = await http.post(
         Uri.parse("$baseUrl/send-otp"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email}), // ONLY email
+        body: jsonEncode({"email": email}),
       );
       return jsonDecode(response.body);
     } catch (e) {
@@ -52,7 +60,10 @@ class AuthService {
       final response = await http.post(
         Uri.parse("$baseUrl/verify-otp"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "otp": otp}),
+        body: jsonEncode({
+          "email": email,
+          "otp": otp
+        }),
       );
       return jsonDecode(response.body);
     } catch (e) {
@@ -66,7 +77,11 @@ class AuthService {
       final response = await http.post(
         Uri.parse("$baseUrl/reset-password"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "otp": otp, "new_password": newPassword}),
+        body: jsonEncode({
+          "email": email,
+          "otp": otp,
+          "new_password": newPassword
+        }),
       );
       return jsonDecode(response.body);
     } catch (e) {

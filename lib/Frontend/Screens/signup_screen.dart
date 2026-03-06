@@ -201,7 +201,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           content:
                                               Text(result["error"] ?? "Error")),
                                     );
+                                  } else if (result["user"] == null) {
+                                    // User exists but email not confirmed
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            "Signup successful! Please check your email to confirm your account."),
+                                      ),
+                                    );
                                   } else {
+                                    // User is verified and can go to Dashboard
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
