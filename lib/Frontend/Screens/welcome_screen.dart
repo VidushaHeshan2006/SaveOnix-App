@@ -17,7 +17,7 @@ class WelcomeScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 12),
 
-              // App Icon
+              // App Iconrun 
               const Icon (
                 Icons.account_balance_wallet,
                 size: 48,
