@@ -32,8 +32,8 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 # -----------------------------
 # EMAIL CONFIG
 # -----------------------------
-SMTP_USER = "vidushaheshan316@gmail.com"
-SMTP_PASS = "gchhoazcwkciwnip"
+SMTP_USER = "saveonix@gmail.com"
+SMTP_PASS = "ilcznfdwflggwkfg"
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
